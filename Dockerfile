@@ -8,7 +8,7 @@ ENV PATH=${GRADLE_HOME}/bin:${PATH}
 
 # Install OpenJDK-8
 RUN apt-get update && \
-apt-get install -y openjdk-8-jdk unzip zip && \
+apt-get install -y openjdk-8-jdk unzip zip curl && \
 apt-get install -y ant gradle && \
 apt-get clean;
 
@@ -36,14 +36,15 @@ ENV JAVA_OPTS -Xmx3G
 #for Derby Database VOLUME apache-ofbiz-17.12.04/runtime/data
 #Expose port 
 EXPOSE 8443
+EXPOSE 8080
 
 WORKDIR apache-ofbiz-${OFBIZ}
 
 # Granting permission to gradlew 
 # RUN chmod +x ./gradlew
 
-RUN ./gradle/init-gradle-wrapper.sh
+RUN ./gradle/init-gradle-wrapper.sh || :
 # RUN ./gradlew wrapper
 
-# CMD [ "./gradlew build loadAll ofbiz" ] 
+RUN ./gradlew cleanAll loadAll
 ENTRYPOINT  ./gradlew ofbiz
